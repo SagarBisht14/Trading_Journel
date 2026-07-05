@@ -136,25 +136,57 @@ Normal client accounts cannot access `/api/admin/*` routes.
 
 ## Production Deployment
 
+This repo is configured for a split deployment:
+
+- Backend API on Render from `server/`
+- Frontend static app on Vercel from `client/`
+- MongoDB Atlas for production data
+
 ### Render Backend
 
-1. Create a new Render Web Service.
-2. Set the root directory to `server`.
-3. Build command: `npm install`
-4. Start command: `npm start`
-5. Add environment variables from `server/.env.example`.
-6. Set `CLIENT_URL` and `FRONTEND_URL` to your Vercel frontend URL.
-7. Use MongoDB Atlas for `MONGODB_URI`.
+You can deploy with the included `render.yaml` blueprint, or create a Render Web Service manually with these settings:
+
+- Root directory: `server`
+- Runtime: Node
+- Build command: `npm install`
+- Start command: `npm start`
+- Health check path: `/api/health`
+
+Required Render environment variables:
+
+```env
+NODE_ENV=production
+PORT=10000
+MONGODB_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=generate_or_add_a_long_random_secret
+JWT_EXPIRES_IN=7d
+CLIENT_URL=https://your-vercel-app.vercel.app
+FRONTEND_URL=https://your-vercel-app.vercel.app
+ALLOWED_ORIGINS=https://your-vercel-app.vercel.app
+UPLOAD_ROOT=uploads
+ADMIN_SETUP_SECRET=choose_a_private_admin_creation_secret
+```
+
+After the first Vercel deploy, update `CLIENT_URL`, `FRONTEND_URL`, and `ALLOWED_ORIGINS` in Render if your Vercel URL is different from the placeholder in `render.yaml`.
 
 Render disks are recommended if you want uploaded screenshots to persist on Render. For high-scale production, move uploads to S3 or Cloudinary.
 
 ### Vercel Frontend
 
-1. Import the repo into Vercel.
-2. Set the root directory to `client`.
-3. Build command: `npm run build`
-4. Output directory: `dist`
-5. Add `VITE_API_URL` with your Render backend URL.
+The root `vercel.json` is set up to build the client from the monorepo root:
+
+- Framework preset: Vite
+- Install command: `npm install`
+- Build command: `npm run build --workspace client`
+- Output directory: `client/dist`
+
+The included Vercel rewrites proxy `/api/*` and `/uploads/*` to the Render backend. If your Render URL is different from `https://trading-journel.onrender.com`, update it in `vercel.json`.
+
+You can leave `VITE_API_URL` unset on Vercel when using those rewrites. If you prefer direct browser-to-Render API calls, set:
+
+```env
+VITE_API_URL=https://your-render-service.onrender.com
+```
 
 ## Notes
 

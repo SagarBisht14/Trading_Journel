@@ -1,10 +1,11 @@
 services:
   - type: web
-    name: trading-journal-api
-    env: node
+    name: trading-journel
+    runtime: node
     rootDir: server
-    buildCommand: cd .. && npm install && npm run render:build
+    buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -14,11 +15,15 @@ services:
         generateValue: true
       - key: JWT_EXPIRES_IN
         value: 7d
+      - key: MONGODB_URI
+        sync: false
       - key: UPLOAD_ROOT
         value: uploads
       - key: CLIENT_URL
-        value: https://trading-journel-client.vercel.app/
+        value: https://trading-journel-client.vercel.app
       - key: FRONTEND_URL
-        value: https://trading-journel-client.vercel.app/
+        value: https://trading-journel-client.vercel.app
       - key: ALLOWED_ORIGINS
-        value: https://trading-journel-client.vercel.app/
+        value: https://trading-journel-client.vercel.app
+      - key: ADMIN_SETUP_SECRET
+        sync: false

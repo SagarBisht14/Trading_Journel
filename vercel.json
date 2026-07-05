@@ -1,17 +1,12 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "https://trading-journel.onrender.com/api/$1" },
-    { "src": "/uploads/(.*)", "dest": "https://trading-journel.onrender.com/uploads/$1" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build --workspace client",
+  "outputDirectory": "client/dist",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://trading-journel.onrender.com/api/:path*" },
+    { "source": "/uploads/:path*", "destination": "https://trading-journel.onrender.com/uploads/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

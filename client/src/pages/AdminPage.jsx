@@ -1,5 +1,5 @@
 import { BarChart3, Eye, ShieldCheck, Users, WalletCards } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import PageHeader from '../components/PageHeader.jsx';
 import StatCard from '../components/StatCard.jsx';
@@ -15,21 +15,21 @@ export default function AdminPage() {
   const [selected, setSelected] = useState(null);
   const [loadingData, setLoadingData] = useState(false);
 
+  const loadOverview = useCallback(async () => {
+    const { data } = await api.get('/admin/overview');
+    setOverview(data);
+  }, []);
+
+  const loadUsers = useCallback(async (value = '') => {
+    const { data } = await api.get('/admin/users', { params: { search: value } });
+    setUsers(data.items || []);
+  }, []);
+
   useEffect(() => {
     if (user?.role !== 'admin') return;
     loadOverview();
     loadUsers();
-  }, [user?.role]);
-
-  const loadOverview = async () => {
-    const { data } = await api.get('/admin/overview');
-    setOverview(data);
-  };
-
-  const loadUsers = async (value = search) => {
-    const { data } = await api.get('/admin/users', { params: { search: value } });
-    setUsers(data.items || []);
-  };
+  }, [loadOverview, loadUsers, user?.role]);
 
   const openClient = async (client) => {
     setLoadingData(true);

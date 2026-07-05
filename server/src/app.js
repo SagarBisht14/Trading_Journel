@@ -26,10 +26,21 @@ dotenv.config();
 
 const app = express();
 const uploadRoot = process.env.UPLOAD_ROOT || 'uploads';
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:5173')
-  .split(',')
-  .map((origin) => origin.trim())
+const normalizeOrigin = (origin) => origin.trim().replace(/\/$/, '');
+const configuredOrigins = [
+  process.env.ALLOWED_ORIGINS,
+  process.env.CLIENT_URL,
+  process.env.FRONTEND_URL
+]
   .filter(Boolean);
+const allowedOrigins = configuredOrigins.flatMap((value) => value.split(',').map(normalizeOrigin).filter(Boolean));
+const normalizedAllowedOrigins = new Set([
+  ...allowedOrigins,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000'
+]);
 
 app.set('trust proxy', 1);
 app.use(helmet({ crossOriginResourcePolicy: false }));
@@ -37,7 +48,8 @@ app.use(compression());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      const normalizedOrigin = origin ? normalizeOrigin(origin) : '';
+      if (!origin || normalizedAllowedOrigins.has(normalizedOrigin) || normalizedAllowedOrigins.has('*')) {
         callback(null, true);
         return;
       }

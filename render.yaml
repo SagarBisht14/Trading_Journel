@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: trading-journal-api
+    env: node
+    rootDir: server
+    buildCommand: cd .. && npm install && npm run render:build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: UPLOAD_ROOT
+        value: uploads
+      - key: CLIENT_URL
+        value: https://trading-journel-client.vercel.app/
+      - key: FRONTEND_URL
+        value: https://trading-journel-client.vercel.app/
+      - key: ALLOWED_ORIGINS
+        value: https://trading-journel-client.vercel.app/

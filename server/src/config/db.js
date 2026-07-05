@@ -4,7 +4,7 @@ export async function connectDatabase() {
   const uri = process.env.MONGODB_URI;
 
   if (!uri) {
-    throw new Error('MONGODB_URI is required. Add it to server/.env.');
+    throw new Error('MONGODB_URI is required. Add it in Render -> Environment Variables.');
   }
 
   mongoose.set('strictQuery', true);
